@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 import mysql.connector
 import datetime
-from convdate import date_convert,time_delta
+from bin.convdate import date_convert,time_delta
 import time
 import shutil 
 import os
@@ -386,8 +386,6 @@ def main():
         config.settings=[]
         dbmoto.get_config()
         pool.hist_article_check()
-        #pool.img_fetch("https://ireland.apollo.olxcdn.com/v1/files/eyJmbiI6ImtzN3pzbzk1N3BuMTItT1RPTU9UT1BMIiwidyI6W3siZm4iOiJ3ZzRnbnFwNnkxZi1PVE9NT1RPUEwiLCJzIjoiMTYiLCJwIjoiMTAsLTEwIiwiYSI6IjAifV19.PYPVNE21FNxjEGgkZ_mcHmc07gK5dPcfXesGyKPCCS8/image;s=1080x720","1","1_1.jpeg")
-        #print(pool.feth("https://www.otomoto.pl/osobowe/mercedes-benz/m-klasa/warszawa/?search%5Bfilter_enum_generation%5D%5B0%5D=gen-w164-2005&search%5Border%5D=created_at%3Adesc&search%5Bbrand_program_id%5D%5B0%5D=&search%5Bdist%5D=50&search%5Bcountry%5D="))
         with Bar('Processing searches!',max = len(config.settings)) as bar:
             for a in config.settings:
                 if int(a['Status']) == 1:
