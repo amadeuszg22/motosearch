@@ -142,7 +142,12 @@ class pool:
                         error=sup.find('span', attrs={'class':'subtitle'}).text.strip()
                     except(AttributeError):
                         error=sup.find('span', attrs={'class':'subtitle'})
-                    if error == "404 Strona nie została odnaleziona":
+                    try:
+                        tmpid=sup.find_all('span', attrs={'class':'offer-meta__value'})[1].text.strip()
+                    except(IndexError):
+                        tmpid = False
+                    #print (raw.status_code,a['ID'])
+                    if raw.status_code == 404 or error == "404 Strona nie została odnaleziona" or tmpid == False:
                         #print (error)
                         dbmoto.update_items("m_article&links_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
                         val=[]
@@ -358,7 +363,7 @@ class dbmoto:
                 val1 = (a['Timeup'],int(a['ID']),"Info","SQL Insert","record inserted to Sys_log table.")
                 dbmoto.mycursor.execute(sql1,val1)
                 config.mydb.commit()
-            timen=datetime.datetime.now()
+            #timen=datetime.datetime.now()
             config.sys_log =[]
             
 
