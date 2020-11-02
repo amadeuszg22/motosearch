@@ -169,12 +169,12 @@ class pool:
                     #print (raw.status_code,a['ID'])
                     if raw.status_code == 404 or error == "404 Strona nie została odnaleziona" or tmpid == False:
                         #print (error)
-                        dbmoto.update_items("m_article&links_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
+                        dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
                         val=[]
                         val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status change to Inactive"}
                         config.sys_log.append(val)
                     else:
-                        dbmoto.update_items("m_article&links_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
+                        dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
                         val=[]
                         val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active for"+str(a['ID'])}
                         config.sys_log.append(val)
@@ -232,7 +232,7 @@ class dbmoto:
                 config.time_update()
                 settings['Sys_ID']=i[0]
                 settings['Title']=i[1]
-                settings['Link']=i[2]
+                settings['Links']=i[2]
                 settings['User']=i[3]
                 settings['Status']=i[4]
                 settings['L_up']=i[5]
@@ -242,8 +242,8 @@ class dbmoto:
                 bar.next()
    
     def check_id(id,table):
-        if table == "links":
-            dbmoto.mycursor.execute("SELECT * FROM links WHERE ID ='"+id+"'")
+        if table == "link":
+            dbmoto.mycursor.execute("SELECT * FROM link WHERE ID ='"+id+"'")
             myresult = dbmoto.mycursor.fetchall()
             lst =[]
             for x in myresult:
@@ -289,9 +289,9 @@ class dbmoto:
         for a in config.d_list:
             config.time_update()
             #print (dbmoto.check_id(a['ID']))
-            if dbmoto.check_id(a['ID'],"links") is not True:
+            if dbmoto.check_id(a['ID'],"link") is not True:
                 val=[]
-                sql = "INSERT INTO links (Sys_ID ,ID, Title, Link,Status,Timeup) VALUES (%s,%s, %s, %s,%s,%s)"
+                sql = "INSERT INTO link (Sys_ID ,ID, Title, Link,Status,Timeup) VALUES (%s,%s, %s, %s,%s,%s)"
                 val = (a['Sys_ID'],int(a['ID']),a['Title'],a['Link'],"Active",config.date)
                 dbmoto.mycursor.execute(sql,val)
                 config.mydb.commit()
@@ -299,7 +299,7 @@ class dbmoto:
                 config.d_list=[]
             else:
                 #print ("exist:",a['ID'])
-                dbmoto.update_items("links",a['ID'])
+                dbmoto.update_items("link",a['ID'])
                 config.d_list=[]
                 #bar.next()
         #with Bar('      Updateing m_article table!',max = len(config.a_list)) as bar:
@@ -353,8 +353,8 @@ class dbmoto:
 
     def update_items(table,ID,*args, **kwargs):
         config.time_update()
-        if table =="links":
-            sql = "UPDATE links SET Timeup = '"+str(config.date)+"' WHERE links.ID = '"+ID+"'"
+        if table =="link":
+            sql = "UPDATE link SET Timeup = '"+str(config.date)+"' WHERE link.ID = '"+ID+"'"
             dbmoto.mycursor.execute(sql)
             config.mydb.commit()
             #print(dbmoto.mycursor.rowcount, "record updated in links table.")
@@ -369,13 +369,13 @@ class dbmoto:
                 dbmoto.mycursor.execute(sql)
                 config.mydb.commit()
                 #print(dbmoto.mycursor.rowcount, "record updated in m_article table.")
-        elif table == "m_article&links_incative":
+        elif table == "m_article&link_incative":
             if kwargs:
                 val=kwargs.get('data')
                 config.time_update()
                 if val['Status'] == 'Inactive':
                     days= time_delta(str(config.date),val['Since']+".100001")
-                    sql1 = "UPDATE links SET Timeup = '"+str(config.date)+"', Status='Inactive' WHERE links.ID = '"+str(ID)+"'"
+                    sql1 = "UPDATE link SET Timeup = '"+str(config.date)+"', Status='Inactive' WHERE link.ID = '"+str(ID)+"'"
                     dbmoto.mycursor.execute(sql1)
                     sql2 = "UPDATE m_article SET Timeup = '"+str(config.date)+"', `Days` = '"+str(days)+"' WHERE m_article.ID = '"+str(ID)+"'"
                     dbmoto.mycursor.execute(sql2)
@@ -383,7 +383,7 @@ class dbmoto:
                     #print(dbmoto.mycursor.rowcount, "record updated in m_article and links table due to inactive datacheck.")
                 elif val['Status'] == 'Active':
                     days= time_delta(str(config.date),val['Since']+".100001")
-                    sql1 = "UPDATE links SET Timeup = '"+str(config.date)+"', Status='Active' WHERE links.ID = '"+str(ID)+"'"
+                    sql1 = "UPDATE link SET Timeup = '"+str(config.date)+"', Status='Active' WHERE links.ID = '"+str(ID)+"'"
                     dbmoto.mycursor.execute(sql1)
                     sql2 = "UPDATE m_article SET Timeup = '"+str(config.date)+"', `Days` = '"+str(days)+"' WHERE m_article.ID = '"+str(ID)+"'"
                     dbmoto.mycursor.execute(sql2)
@@ -436,7 +436,7 @@ def main():
         with Bar('Processing searches!',max = len(config.settings)) as bar:
             for a in config.settings:
                 if int(a['Status']) == 1:
-                    pool.article_list(a['Link'],a['Sys_ID'],)
+                    pool.article_list(a['Links'],a['Sys_ID'],)
                     #print(len(config.d_list))
                     #for a in config.d_list:
                     #    print (a)
