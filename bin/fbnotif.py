@@ -1,0 +1,4 @@
+from pymessenger.bot import Bot
+
+bot = Bot("EAAFWsYiZBtr4BACANvrVCAV9qJ3LqcwZBJKtA4kGEfKEGZA3bXLcWceZC0y9ZCctnrs0AITDOJf30ZBUZC2JlA5Gwy7HD6Geoga8fAtoSnxFeoiWZBkDU731U1NOLUImVKZAU9y8fbZCnBSRTiY8w1aCsb0kE2iAcZCQ6wyTpv2CR8FNgZDZD")
+bot.send_text_message("563796407302720", "message")

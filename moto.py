@@ -24,6 +24,8 @@ class config:
     h_data ={}
     p_list=[]
     p_data={}
+    l_list=[]
+    l_data={}
     log={}
     sys_log=[]
     mydb = mysql.connector.connect(
@@ -103,6 +105,24 @@ class pool:
                 config.art_data['Milage'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[1].text.strip()
                 config.art_data['Fuel'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[2].text.strip()
                 config.art_data['Type'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[3].text.strip()
+                
+                detloc=sup.find('span', attrs={'class': 'seller-box__seller-address__label'}).text.strip()
+                detloc_gps=sup.find('div', attrs={'class': 'map-box'}).find('input',attrs={'type':'hidden'})
+                detloc_long = detloc_gps['data-map-lon']
+                detloc_lat =  detloc_gps['data-map-lat']
+                #print (detloc_long, detloc_lat)
+                if sup.find('a', attrs={'class': 'map-picture link-blue'},href=True) is not None: # href=True
+                    detmap =sup.find('a', attrs={'class': 'map-picture link-blue'},href=True)['href']
+                    #print (detmap)
+                else:
+                    detmap ="empty"
+                val=[]
+                val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'location Fetch','Message':"location fetched for"+str(config.p_data)+":"}
+                config.sys_log.append(val)
+                config.l_data={'ID':config.art_data['ID'],'Title':str(detloc),'Link':str(detmap) ,'Long':str(detloc_long),'Lat':str(detloc_lat)}
+                config.l_list.append(config.l_data)
+                config.l_data ={}
+
                 img=sup.find_all('img', attrs={'class': 'bigImage'})
                 val=[]
                 val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Article Fetch','Message':"Article fetched for"+str(config.art_data)+":"}
@@ -119,7 +139,7 @@ class pool:
                     pool.img_fetch(config.p_data['Link'],config.art_data['ID'],config.p_data['F_Name']+".jpeg")
                     c=c+1
                     val=[]
-                    val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Image Fetch','Message':"Article fetched for"+str(config.p_data)+":"}
+                    val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Image Fetch','Message':"Image fetched for"+str(config.p_data)+":"}
                     config.sys_log.append(val)
                     config.p_list.append(config.p_data)
                     config.p_data ={}
@@ -253,6 +273,16 @@ class dbmoto:
                 return True
             else:
                 return False
+        elif table == "m_location":    
+            dbmoto.mycursor.execute("SELECT * FROM m_location WHERE ID ='"+id+"'")
+            myresult = dbmoto.mycursor.fetchall()
+            lst =[]
+            for x in myresult:
+                lst.append(str(x[0]))          
+            if str(id) in lst :
+                return True
+            else:
+                return False
                 
     def add_items():
         #with Bar('      Updateing links table!',max = len(config.d_list)) as bar:
@@ -302,6 +332,18 @@ class dbmoto:
                    config.p_list=[]
                    #bar.next()
         config.p_list=[]
+        for a in config.l_list:
+            #print (config.l_list)
+            if dbmoto.check_id(a['ID'],"m_location") is not True:
+                   config.time_update()
+                   val=[]
+                   sql = "INSERT INTO m_location (ID,Title,Link,Lng,Lat,Timeup) Values (%s,%s,%s,%s,%s,%s)"
+                   val = (int(a['ID']),a['Title'],a['Link'],'"'+a['Long']+'"','"'+a['Lat']+'"',config.date)
+                   dbmoto.mycursor.execute(sql,val)
+                   config.mydb.commit()
+                   #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
+                   config.l_list=[]
+
     def get_since(id):
         dbmoto.mycursor.execute("SELECT Since FROM m_article WHERE ID ='"+id+"'")
         myresult = dbmoto.mycursor.fetchall()
