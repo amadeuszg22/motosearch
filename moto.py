@@ -156,7 +156,7 @@ class pool:
             for a in config.h_list:
                 config.time_update()
                 if a['Timeup'] < (config.date - datetime.timedelta(days=1)) or a['Status'] == "Inactive":
-                    raw= pool.feth(a['Link'])
+                    raw= pool.feth(a['Links'])
                     sup = BeautifulSoup(raw.text, features="html.parser")
                     try:
                         error=sup.find('span', attrs={'class':'subtitle'}).text.strip()
@@ -168,12 +168,13 @@ class pool:
                         tmpid = False
                     #print (raw.status_code,a['ID'])
                     if raw.status_code == 404 or error == "404 Strona nie została odnaleziona" or tmpid == False:
-                        #print (error)
-                        dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
-                        val=[]
-                        val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status change to Inactive"}
-                        config.sys_log.append(val)
-                    else:
+                        if a['Status'] == "Active":
+                            #print (error)
+                            dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
+                            val=[]
+                            val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Inactive"}
+                            config.sys_log.append(val)
+                    elif a['Status'] == "Inactive":
                         dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
                         val=[]
                         val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active for"+str(a['ID'])}
@@ -383,7 +384,7 @@ class dbmoto:
                     #print(dbmoto.mycursor.rowcount, "record updated in m_article and links table due to inactive datacheck.")
                 elif val['Status'] == 'Active':
                     days= time_delta(str(config.date),val['Since']+".100001")
-                    sql1 = "UPDATE link SET Timeup = '"+str(config.date)+"', Status='Active' WHERE links.ID = '"+str(ID)+"'"
+                    sql1 = "UPDATE link SET Timeup = '"+str(config.date)+"', Status='Active' WHERE link.ID = '"+str(ID)+"'"
                     dbmoto.mycursor.execute(sql1)
                     sql2 = "UPDATE m_article SET Timeup = '"+str(config.date)+"', `Days` = '"+str(days)+"' WHERE m_article.ID = '"+str(ID)+"'"
                     dbmoto.mycursor.execute(sql2)
@@ -417,7 +418,7 @@ class dbmoto:
             config.time_update()
             config.h_data['ID']=i[0]
             config.h_data['Sys_ID']=i[1]
-            config.h_data['Link']=i[2]
+            config.h_data['Links']=i[2]
             config.h_data['Days']=i[3]
             config.h_data['Since']=i[4]
             config.h_data['Timeup']=i[5]
