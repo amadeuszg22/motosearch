@@ -401,9 +401,9 @@ class dbmoto:
                 dbmoto.mycursor.execute(sql,val)
                 config.mydb.commit()
                 #print(dbmoto.mycursor.rowcount, "record inserted to Sys_log table.")
-                val1=[]
-                sql1 = "INSERT INTO sys_log (Timeup,ID,Category,Activity,Message ) VALUES (%s,%s, %s, %s,%s)"
-                val1 = (a['Timeup'],int(a['ID']),"Info","SQL Insert","record inserted to Sys_log table.")
+                #val1=[]
+                #sql1 = "INSERT INTO sys_log (Timeup,ID,Category,Activity,Message ) VALUES (%s,%s, %s, %s,%s)"
+                #val1 = (a['Timeup'],int(a['ID']),"Info","SQL Insert","record inserted to Sys_log table.")
                 dbmoto.mycursor.execute(sql1,val1)
                 config.mydb.commit()
             #timen=datetime.datetime.now()
