@@ -404,7 +404,7 @@ class dbmoto:
                 #val1=[]
                 #sql1 = "INSERT INTO sys_log (Timeup,ID,Category,Activity,Message ) VALUES (%s,%s, %s, %s,%s)"
                 #val1 = (a['Timeup'],int(a['ID']),"Info","SQL Insert","record inserted to Sys_log table.")
-                dbmoto.mycursor.execute(sql1,val1)
+                #dbmoto.mycursor.execute(sql1,val1)
                 config.mydb.commit()
             #timen=datetime.datetime.now()
             config.sys_log =[]
