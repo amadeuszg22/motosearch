@@ -1,9 +1,11 @@
 class m_detail():
     detail={}
+    timeoup=""
     def __init__(self):
         return None
-    def detail_verify(self,details):
+    def detail_verify(self,details,timeoup):
         self.detail=details
+        self.timeoup=timeoup
         lst=[]
         lst.append(details['ID'])
         if 'Oferta od' in self.detail.keys():
@@ -114,8 +116,9 @@ class m_detail():
             lst.append(self.detail['Stan'])
         else:
             lst.append("empty")
+        lst.append(self.timeoup)
 
         return lst
-det={'ID':2123123,}
+#det={'ID':2123123,}
 
-print(m_detail().detail_verify(det))
+#print(m_detail().detail_verify(det))

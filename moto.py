@@ -373,13 +373,13 @@ class dbmoto:
             #print (config.l_list)
             if dbmoto.check_id(a['ID'],"m_detail") is not True:
                    config.time_update()
-                   print(m_detail().detail_verify(a))
+                   #print(m_detail().detail_verify(a,config.date))
                    #val=[]
-                   #sql = "INSERT INTO m_detail (ID,Title,Link,Lng,Lat,Timeup) Values (%s,%s,%s,%s,%s,%s)"
+                   sql = "INSERT INTO m_detail (ID, Ofer, Category, Vendor, Model, Version, Gen, Year, Milage, En_l, Fuel, Hp, Transmission, Drive, C_status, Typ, Door, Seats, Colour, Metallic, Finance, PL, Register, Pl_reg, Plates, F_owner, Aso, State, Timeup) Values (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                    #val = (int(a['ID']),a['Title'],a['Link'],'"'+a['Long']+'"','"'+a['Lat']+'"',config.date)
-                   #dbmoto.mycursor.execute(sql,val)
-                   #config.mydb.commit()
-                   #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
+                   dbmoto.mycursor.execute(sql,m_detail().detail_verify(a,config.date))
+                   config.mydb.commit()
+                   #print(dbmoto.mycursor.rowcount, "record inserted to m_Details table.")
                    config.l_detail=[]           
 
     def get_since(id):
