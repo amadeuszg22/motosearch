@@ -96,12 +96,12 @@ class m_detail():
             lst.append(self.detail['Pierwsza rejestracja'])
         else:
             lst.append("empty")
-        if 'Numer rejestracyjny pojazdu' in self.detail.keys():
-            lst.append(self.detail['Numer rejestracyjny pojazdu'])
-        else:
-            lst.append("empty")
         if 'Zarejestrowany w Polsce' in self.detail.keys():
             lst.append(self.detail['Zarejestrowany w Polsce'])
+        else:
+            lst.append("empty")
+        if 'Numer rejestracyjny pojazdu' in self.detail.keys():
+            lst.append(self.detail['Numer rejestracyjny pojazdu'])
         else:
             lst.append("empty")
         if 'Pierwszy właściciel' in self.detail.keys():
