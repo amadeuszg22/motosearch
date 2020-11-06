@@ -122,6 +122,18 @@ class pool:
                 config.l_data={'ID':config.art_data['ID'],'Title':str(detloc),'Link':str(detmap) ,'Long':str(detloc_long),'Lat':str(detloc_lat)}
                 config.l_list.append(config.l_data)
                 config.l_data ={}
+                
+                detl=sup.find_all('div', attrs={'class': 'offer-params__value'})
+                dett=sup.find_all('span', attrs={'class': 'offer-params__label'})
+                item=[]
+                key=[]
+                for a in detl:
+                    item.append(a.text.strip())
+                for a in dett:
+                    key.append(a.text.strip())
+                detdict=dict(zip(key,item))  
+                #print (detdict)
+                #print (len(detdict))
 
                 img=sup.find_all('img', attrs={'class': 'bigImage'})
                 val=[]
@@ -155,7 +167,7 @@ class pool:
         with Bar('Checking historical data:',max = len(config.h_list)) as bar:
             for a in config.h_list:
                 config.time_update()
-                if a['Timeup'] < (config.date - datetime.timedelta(days=1)) or a['Status'] == "Inactive":
+                if a['Timeup'] < (config.date - datetime.timedelta(hours=3)) or a['Status'] == "Inactive":
                     raw= pool.feth(a['Links'])
                     sup = BeautifulSoup(raw.text, features="html.parser")
                     try:
@@ -298,6 +310,9 @@ class dbmoto:
                 config.mydb.commit()
                 #print(dbmoto.mycursor.rowcount, "record inserted to links table.")
                 config.d_list=[]
+                log={}
+                log={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"New item, Article status set to Active for"+str(a['ID'])}
+                config.sys_log.append(log)
             else:
                 #print ("exist:",a['ID'])
                 dbmoto.update_items("link",a['ID'])
