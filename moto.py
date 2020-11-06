@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import mysql.connector
 import datetime
 from bin.convdate import date_convert,time_delta
+from bin.data_check import m_detail
 import time
 import shutil 
 import os
@@ -26,6 +27,7 @@ class config:
     p_data={}
     l_list=[]
     l_data={}
+    l_detail=[]
     log={}
     sys_log=[]
     mydb = mysql.connector.connect(
@@ -36,11 +38,8 @@ class config:
     )
     date = datetime.datetime.now()
 
-    
     def time_update():
         config.date=datetime.datetime.now()
-
-
 
 class pool:
     def feth(url):
@@ -131,9 +130,10 @@ class pool:
                     item.append(a.text.strip())
                 for a in dett:
                     key.append(a.text.strip())
-                detdict=dict(zip(key,item))  
-                #print (detdict)
-                #print (len(detdict))
+                detdict=dict(zip(key,item))
+                detdict['ID']=config.art_data['ID']
+                config.l_detail.append(detdict)
+                detdict={}
 
                 img=sup.find_all('img', attrs={'class': 'bigImage'})
                 val=[]
@@ -151,7 +151,7 @@ class pool:
                     pool.img_fetch(config.p_data['Link'],config.art_data['ID'],config.p_data['F_Name']+".jpeg")
                     c=c+1
                     val=[]
-                    val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Image Fetch','Message':"Image fetched for"+str(config.p_data)+":"}
+                    val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Image Fetch','Message':"Image fetched for "+str(config.p_data)+":"}
                     config.sys_log.append(val)
                     config.p_list.append(config.p_data)
                     config.p_data ={}
@@ -189,7 +189,7 @@ class pool:
                     elif a['Status'] == "Inactive":
                         dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
                         val=[]
-                        val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active for"+str(a['ID'])}
+                        val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active for "+str(a['ID'])}
                         config.sys_log.append(val)
                 bar.next()
             config.h_list=[]
@@ -296,6 +296,16 @@ class dbmoto:
                 return True
             else:
                 return False
+        elif table == "m_detail":    
+            dbmoto.mycursor.execute("SELECT ID FROM m_detail WHERE ID ='"+id+"'")
+            myresult = dbmoto.mycursor.fetchall()
+            lst =[]
+            for x in myresult:
+                lst.append(str(x[0]))          
+            if str(id) in lst :
+                return True
+            else:
+                return False
                 
     def add_items():
         #with Bar('      Updateing links table!',max = len(config.d_list)) as bar:
@@ -359,6 +369,18 @@ class dbmoto:
                    config.mydb.commit()
                    #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
                    config.l_list=[]
+        for a in config.l_detail:
+            #print (config.l_list)
+            if dbmoto.check_id(a['ID'],"m_detail") is not True:
+                   config.time_update()
+                   print(m_detail().detail_verify(a))
+                   #val=[]
+                   #sql = "INSERT INTO m_detail (ID,Title,Link,Lng,Lat,Timeup) Values (%s,%s,%s,%s,%s,%s)"
+                   #val = (int(a['ID']),a['Title'],a['Link'],'"'+a['Long']+'"','"'+a['Lat']+'"',config.date)
+                   #dbmoto.mycursor.execute(sql,val)
+                   #config.mydb.commit()
+                   #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
+                   config.l_detail=[]           
 
     def get_since(id):
         dbmoto.mycursor.execute("SELECT Since FROM m_article WHERE ID ='"+id+"'")
