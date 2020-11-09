@@ -77,9 +77,9 @@ class pool:
                     config.data['Link']=h['href']
                     config.d_list.append(config.data)
                     config.data={}
-                    val=[]
-                    val={'Timeup':config.date,'ID':Sys_ID,'Category':"Info",'Activity':'Link Fetch','Message':"Article links fetched for Sys_ID:"+str(Sys_ID)+" Link:"+url}
-                    config.sys_log.append(val)
+                    #val=[]
+                    #val={'Timeup':config.date,'ID':Sys_ID,'Category':"Info",'Activity':'Link Fetch','Message':"Article links fetched for Sys_ID:"+str(Sys_ID)+" Link:"+url}
+                    #config.sys_log.append(val)
                       
     def article_fetch():
         #with Bar('       Getting articles and pictures',max = len(config.d_list)) as bar:
