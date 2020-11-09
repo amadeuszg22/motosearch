@@ -115,10 +115,10 @@ class pool:
                     #print (detmap)
                 else:
                     detmap ="empty"
+                config.l_data={'ID':config.art_data['ID'],'Title':str(detloc),'Link':str(detmap) ,'Long':str(detloc_long),'Lat':str(detloc_lat)}
                 val=[]
                 val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'location Fetch','Message':"location fetched for"+str(config.l_data)+":"}
                 config.sys_log.append(val)
-                config.l_data={'ID':config.art_data['ID'],'Title':str(detloc),'Link':str(detmap) ,'Long':str(detloc_long),'Lat':str(detloc_lat)}
                 config.l_list.append(config.l_data)
                 config.l_data ={}
                 
