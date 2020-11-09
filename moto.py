@@ -116,7 +116,7 @@ class pool:
                 else:
                     detmap ="empty"
                 val=[]
-                val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'location Fetch','Message':"location fetched for"+str(config.p_data)+":"}
+                val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'location Fetch','Message':"location fetched for"+str(config.l_data)+":"}
                 config.sys_log.append(val)
                 config.l_data={'ID':config.art_data['ID'],'Title':str(detloc),'Link':str(detmap) ,'Long':str(detloc_long),'Lat':str(detloc_lat)}
                 config.l_list.append(config.l_data)
@@ -150,9 +150,9 @@ class pool:
                     config.p_data['Image']=config.img_src+config.art_data['ID']+"/"+config.p_data['F_Name']+".jpeg"
                     pool.img_fetch(config.p_data['Link'],config.art_data['ID'],config.p_data['F_Name']+".jpeg")
                     c=c+1
-                    val=[]
-                    val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Image Fetch','Message':"Image fetched for "+str(config.p_data)+":"}
-                    config.sys_log.append(val)
+                    #val=[]
+                    #val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Image Fetch','Message':"Image fetched for "+str(config.p_data)+":"}
+                    #config.sys_log.append(val)
                     config.p_list.append(config.p_data)
                     config.p_data ={}
                         
@@ -201,19 +201,18 @@ class pool:
             if r.status_code == 200:
             # Set decode_content value to True, otherwise the downloaded image file's size will be zero.
                 r.raw.decode_content = True
-                try:
-                    os.mkdir(config.img_src+ID+"/")
-                except OSError:
-                    #print ("Creation of the directory %s failed"+config.img_src+ID+"/")
-                    val=[]
-                    val={'Timeup':config.date,'ID':ID,'Category':"Error",'Activity':'Directory creation','Message':"Creation of the directory failed"+config.img_src+ID+"/"}
-                    config.sys_log.append(val)
-                else:
-                    #print ("Successfully created the directory %s "+config.img_src+ID+"/")
-                    val=[]
-                    val={'Timeup':config.date,'ID':ID,'Category':"Info",'Activity':'Directory creation','Message':"Successfully created the directory "+config.img_src+ID+"/"}
-                    config.sys_log.append(val)
-                
+                if os.path.isfile(config.img_src+ID+"/") == False:
+                    try:
+                        os.mkdir(config.img_src+ID+"/")
+                        val=[]
+                        val={'Timeup':config.date,'ID':ID,'Category':"Info",'Activity':'Directory creation','Message':"Successfully created the directory "+config.img_src+ID+"/"}
+                        config.sys_log.append(val)
+                    except OSError:
+                        #print ("Creation of the directory %s failed"+config.img_src+ID+"/")
+                        val=[]
+                        val={'Timeup':config.date,'ID':ID,'Category':"Error",'Activity':'Directory creation','Message':"Creation of the directory failed"+config.img_src+ID+"/"}
+                        config.sys_log.append(val)
+               
                 #filename = "./images/"+filename
                 #print (filename)
             # Open a local file with wb ( write binary ) permission.
