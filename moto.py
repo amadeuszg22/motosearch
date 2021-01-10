@@ -11,7 +11,7 @@ import os
 from progress.bar import Bar
 import configparser
 
-
+tic = time.perf_counter()
 class config:
     conf=configparser.ConfigParser()
     conf.read('config.ini')
@@ -495,7 +495,8 @@ def main():
                     config.mydb.close()
                 bar.next()
         dbmoto.add_log()
-        print ('Processing finished Sucessfully!')
+        toc = time.perf_counter()
+        print (f'Processing finished Sucessfully in: {toc - tic:0.4f} seconds')
         time.sleep(3600)
 if __name__=="__main__":
         main()
