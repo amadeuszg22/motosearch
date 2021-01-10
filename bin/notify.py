@@ -9,7 +9,7 @@ import configparser
 
 class config:
     conf=configparser.ConfigParser()
-    conf.read('config.ini')
+    conf.read('../config.ini')
     mydb = mysql.connector.connect(
     host=conf.get('mysql','host'),
     user=conf.get('mysql','user'),

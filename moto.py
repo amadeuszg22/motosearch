@@ -60,27 +60,34 @@ class pool:
         data=pool.feth(url)
         sup = BeautifulSoup(data.text, features="html.parser")
         offers = sup.find('div', attrs={'class':'offers list'})
-        article =offers.find_all('article')
-        #offer_items =offers.find_all('div', attrs={'class':'offer-item__title'})
-        return article
+        try:
+            article =offers.find_all('article')
+            #offer_items =offers.find_all('div', attrs={'class':'offer-item__title'})
+            return article
+        except(AttributeError): 
+                   print ('no articles meet search')
+
     def article_list(url,Sys_ID):
-        for a in pool.parse(url):
-            for b in a.find_all('div', attrs={'class':'offer-item__title'}):
-                for h in b.find_all('a', href=True):
-                    config.time_update()
-                    #print ("ID:"+h['data-ad-id'])
-                    #print ("Title:"+h['title'])
-                    #print ("link:"+h['href'])
-                    config.data['Sys_ID']=Sys_ID
-                    config.data['ID']=h['data-ad-id']
-                    config.data['Title']=h['title']
-                    config.data['Link']=h['href']
-                    config.d_list.append(config.data)
-                    config.data={}
-                    #val=[]
-                    #val={'Timeup':config.date,'ID':Sys_ID,'Category':"Info",'Activity':'Link Fetch','Message':"Article links fetched for Sys_ID:"+str(Sys_ID)+" Link:"+url}
-                    #config.sys_log.append(val)
-                      
+        try:
+            for a in pool.parse(url):
+                for b in a.find_all('div', attrs={'class':'offer-item__title'}):
+                    for h in b.find_all('a', href=True):
+                        config.time_update()
+                        #print ("ID:"+h['data-ad-id'])
+                        #print ("Title:"+h['title'])
+                        #print ("link:"+h['href'])
+                        config.data['Sys_ID']=Sys_ID
+                        config.data['ID']=h['data-ad-id']
+                        config.data['Title']=h['title']
+                        config.data['Link']=h['href']
+                        config.d_list.append(config.data)
+                        config.data={}
+                        #val=[]
+                        #val={'Timeup':config.date,'ID':Sys_ID,'Category':"Info",'Activity':'Link Fetch','Message':"Article links fetched for Sys_ID:"+str(Sys_ID)+" Link:"+url}
+                        #config.sys_log.append(val)
+        except(TypeError): 
+                   print ('no articles available for'+url)
+
     def article_fetch():
         #with Bar('       Getting articles and pictures',max = len(config.d_list)) as bar:
         for a in config.d_list:
@@ -99,7 +106,7 @@ class pool:
                 #print(config.art_data) #sup.find('span', attrs={'class':'offer-meta__value'}).text.strip()
                 art = sup.find('div', attrs={'class':'offer-header__row hidden-xs visible-tablet-up'})
                 config.art_data['Title'] =art.find('h1', attrs={'class':'offer-title big-text'}).text.strip()
-                config.art_data['Price'] = art.find('div', attrs={'class':'offer-price'})['data-price']
+                config.art_data['Price'] = art.find('div', attrs={'class':'offer-price'})['data-price'].replace(" ", "")
                 config.art_data['Year'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[0].text.strip()
                 config.art_data['Milage'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[1].text.strip()
                 config.art_data['Fuel'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[2].text.strip()
@@ -189,7 +196,7 @@ class pool:
                     elif a['Status'] == "Inactive":
                         dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
                         val=[]
-                        val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active for "+str(a['ID'])}
+                        val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active"}
                         config.sys_log.append(val)
                 bar.next()
             config.h_list=[]
@@ -320,7 +327,7 @@ class dbmoto:
                 #print(dbmoto.mycursor.rowcount, "record inserted to links table.")
                 config.d_list=[]
                 log={}
-                log={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"New item, Article status set to Active for"+str(a['ID'])}
+                log={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"New item, Article status set to Active"}
                 config.sys_log.append(log)
             else:
                 #print ("exist:",a['ID'])
@@ -488,6 +495,7 @@ def main():
                     config.mydb.close()
                 bar.next()
         dbmoto.add_log()
+        print ('Processing finished Sucessfully!')
         time.sleep(3600)
 if __name__=="__main__":
         main()
