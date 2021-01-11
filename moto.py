@@ -61,32 +61,43 @@ class pool:
         sup = BeautifulSoup(data.text, features="html.parser")
         offers = sup.find('div', attrs={'class':'offers list'})
         try:
+            if sup.find_all('span', attrs={'class':'page'})[-1].text.strip():
+                pages=int(sup.find_all('span', attrs={'class':'page'})[-1].text.strip())
+        except(IndexError):
+            pages=1
+        try:
             article =offers.find_all('article')
             #offer_items =offers.find_all('div', attrs={'class':'offer-item__title'})
-            return article
+            return {'article':article,'pages':pages}
         except(AttributeError): 
                    print ('no articles meet search')
 
     def article_list(url,Sys_ID):
-        try:
-            for a in pool.parse(url):
-                for b in a.find_all('div', attrs={'class':'offer-item__title'}):
-                    for h in b.find_all('a', href=True):
-                        config.time_update()
-                        #print ("ID:"+h['data-ad-id'])
-                        #print ("Title:"+h['title'])
-                        #print ("link:"+h['href'])
-                        config.data['Sys_ID']=Sys_ID
-                        config.data['ID']=h['data-ad-id']
-                        config.data['Title']=h['title']
-                        config.data['Link']=h['href']
-                        config.d_list.append(config.data)
-                        config.data={}
-                        #val=[]
-                        #val={'Timeup':config.date,'ID':Sys_ID,'Category':"Info",'Activity':'Link Fetch','Message':"Article links fetched for Sys_ID:"+str(Sys_ID)+" Link:"+url}
-                        #config.sys_log.append(val)
-        except(TypeError): 
-                   print ('no articles available for'+url)
+               
+            for x in range(pool.parse(url)['pages']):
+                y=x+1
+                url2=url+"&page="+str(y)
+                try:
+                    for a in pool.parse(url2)['article']:
+                        for b in a.find_all('div', attrs={'class':'offer-item__title'}):
+                            for h in b.find_all('a', href=True):
+                                config.time_update()
+                                #print ("ID:"+h['data-ad-id'])
+                                #print ("Title:"+h['title'])
+                                #print ("link:"+h['href'])
+                                config.data['Sys_ID']=Sys_ID
+                                config.data['ID']=h['data-ad-id']
+                                config.data['Title']=h['title']
+                                config.data['Link']=h['href']
+                                config.d_list.append(config.data)
+                                config.data={}
+                                #val=[]
+                                #val={'Timeup':config.date,'ID':Sys_ID,'Category':"Info",'Activity':'Link Fetch','Message':"Article links fetched for Sys_ID:"+str(Sys_ID)+" Link:"+url}
+                                #config.sys_log.append(val) 
+                    y=y+1                    
+                          
+                except(TypeError): 
+                    print ('no articles available')
 
     def article_fetch():
         #with Bar('       Getting articles and pictures',max = len(config.d_list)) as bar:
