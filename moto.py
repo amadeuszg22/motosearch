@@ -28,6 +28,7 @@ class config:
     l_list=[]
     l_data={}
     l_detail=[]
+    m_desc=[]
     log={}
     sys_log=[]
     mydb = mysql.connector.connect(
@@ -125,7 +126,10 @@ class pool:
                 config.art_data['Type'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[3].text.strip()
                 #Gatehering detailed offer description
                 det_desc = sup.find('div', attrs={'class':'offer-description__description'}).text.strip()
-                print (det_desc)
+                det_descl={}
+                det_descl={'ID':config.art_data['ID'],'Description':det_desc,'Timeup':config.date}
+                config.m_desc.append(det_descl)
+                det_descl={}
 
                 #Gathering location data
                 detloc=sup.find('span', attrs={'class': 'seller-box__seller-address__label'}).text.strip()
@@ -329,6 +333,16 @@ class dbmoto:
                 return True
             else:
                 return False
+        elif table == "m_desc":    
+            dbmoto.mycursor.execute("SELECT ID FROM m_desc WHERE ID ='"+id+"'")
+            myresult = dbmoto.mycursor.fetchall()
+            lst =[]
+            for x in myresult:
+                lst.append(str(x[0]))          
+            if str(id) in lst :
+                return True
+            else:
+                return False
                 
     def add_items():
         #with Bar('      Updateing links table!',max = len(config.d_list)) as bar:
@@ -403,7 +417,18 @@ class dbmoto:
                    dbmoto.mycursor.execute(sql,m_detail().detail_verify(a,config.date))
                    config.mydb.commit()
                    #print(dbmoto.mycursor.rowcount, "record inserted to m_Details table.")
-                   config.l_detail=[]           
+                   config.l_detail=[]
+        for a in config.m_desc:
+            #print (config.l_list)
+            if dbmoto.check_id(a['ID'],"m_desc") is not True:
+                   config.time_update()
+                   val=[]
+                   sql = "INSERT INTO m_desc (ID,Description,Timeup) Values (%s,%s,%s)"
+                   val = (int(a['ID']),a['Description'],config.date)
+                   dbmoto.mycursor.execute(sql,val)
+                   config.mydb.commit()
+                   #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
+                   config.m_desc=[]    
 
     def get_since(id):
         dbmoto.mycursor.execute("SELECT Since FROM m_article WHERE ID ='"+id+"'")
