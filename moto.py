@@ -11,7 +11,7 @@ import os
 from progress.bar import Bar
 import configparser
 
-tic = time.perf_counter()
+
 class config:
     conf=configparser.ConfigParser()
     conf.read('config.ini')
@@ -106,6 +106,7 @@ class pool:
                raw= pool.feth(a['Link']+"")
                sup = BeautifulSoup(raw.text, features="html.parser")
                try:
+                #Gathering basic offer descriprion
                 config.art_data['ID']= sup.find_all('span', attrs={'class':'offer-meta__value'})[1].text.strip()
                 tmptime = sup.find('span', attrs={'class':'offer-meta__value'}).text.strip().partition(',')
                 #print(tmptime[0])
@@ -122,7 +123,11 @@ class pool:
                 config.art_data['Milage'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[1].text.strip()
                 config.art_data['Fuel'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[2].text.strip()
                 config.art_data['Type'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[3].text.strip()
-                
+                #Gatehering detailed offer description
+                det_desc = sup.find('div', attrs={'class':'offer-description__description'}).text.strip()
+                print (det_desc)
+
+                #Gathering location data
                 detloc=sup.find('span', attrs={'class': 'seller-box__seller-address__label'}).text.strip()
                 detloc_gps=sup.find('div', attrs={'class': 'map-box'}).find('input',attrs={'type':'hidden'})
                 detloc_long = detloc_gps['data-map-lon']
@@ -139,7 +144,8 @@ class pool:
                 config.sys_log.append(val)
                 config.l_list.append(config.l_data)
                 config.l_data ={}
-                
+
+                #Gatering offer details like car model vendor milage registration
                 detl=sup.find_all('div', attrs={'class': 'offer-params__value'})
                 dett=sup.find_all('span', attrs={'class': 'offer-params__label'})
                 item=[]
@@ -152,7 +158,7 @@ class pool:
                 detdict['ID']=config.art_data['ID']
                 config.l_detail.append(detdict)
                 detdict={}
-
+                #Gatering offer images
                 img=sup.find_all('img', attrs={'class': 'bigImage'})
                 val=[]
                 val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'Article Fetch','Message':"Article fetched for"+str(config.art_data)+":"}
@@ -481,6 +487,7 @@ class dbmoto:
             config.h_data={}
 def main():
     while True:
+        tic = time.perf_counter()
         config.time_update()
         print("Processing started at: "+str(config.date))
         config.time_update()
