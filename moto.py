@@ -190,9 +190,9 @@ class pool:
                #bar.next()
            
     def hist_article_check():
-        dbmoto.check_exist()
-        with Bar('Checking historical data:',max = len(config.h_list)) as bar:
-            for a in config.h_list:
+        history=dbmoto.check_exist()
+        with Bar('Checking historical data:',max = len(history)) as bar:
+            for a in history:
                 config.time_update()
                 if a['Timeup'] < (config.date - datetime.timedelta(hours=3)) or a['Status'] == "Inactive":
                     raw= pool.feth(a['Links'])
@@ -246,6 +246,7 @@ class pool:
                 with open(filename,'wb+') as f:
                     shutil.copyfileobj(r.raw, f)
             
+        #logging section:   
                 #print('Image sucessfully Downloaded: ',filename)
                 #val=[]
                 #val={'Timeup':config.date,'ID':ID,'Category':"Info",'Activity':'Image download','Message':"Image sucessfully Downloaded: "+filename}
@@ -498,17 +499,22 @@ class dbmoto:
         dbmoto.mycursor.execute("SELECT * FROM v_notify")
         myresult = dbmoto.mycursor.fetchall()
         #print (myresult)
+        data={}
+        lst=[]
         for i in myresult:
             config.time_update()
-            config.h_data['ID']=i[0]
-            config.h_data['Sys_ID']=i[1]
-            config.h_data['Links']=i[2]
-            config.h_data['Days']=i[3]
-            config.h_data['Since']=i[4]
-            config.h_data['Timeup']=i[5]
-            config.h_data['Status']=i[6]
-            config.h_list.append(config.h_data)
-            config.h_data={}
+       
+            data['ID']=i[0]
+            data['Sys_ID']=i[1]
+            data['Links']=i[2]
+            data['Days']=i[3]
+            data['Since']=i[4]
+            data['Timeup']=i[5]
+            data['Status']=i[6]
+            lst.append(data)
+            data={}
+        return lst
+
 def main():
     while True:
         tic = time.perf_counter()
