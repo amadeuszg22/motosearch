@@ -214,11 +214,15 @@ class pool:
                                 val=[]
                                 val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Inactive"}
                                 config.sys_log.append(val)
+                                a['Status']='Inactive'
+                                dbmoto.hist_logging(a,'Deactivated')
                         elif a['Status'] == "Inactive":
                             dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
                             val=[]
                             val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active"}
                             config.sys_log.append(val)
+                            a['Status']='Active'
+                            dbmoto.hist_logging(a,'Reactivated')
                 bar.next()
             
 
@@ -430,6 +434,19 @@ class dbmoto:
                    config.mydb.commit()
                    #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
                    config.m_desc=[]    
+    def hist_logging(dct,stat):
+        if dct :
+            config.time_update()
+            if 'Sys_ID' in dct: del dct['Sys_ID']
+            dct['Timeup']=config.date
+            dct['Art_Status']=stat
+            print (dct)
+            placeholder = ", ".join(["%s"] * len(dct))
+            stmt = "insert into `{table}` ({columns}) values ({values});".format(table='m_history', columns=",".join(dct.keys()), values=placeholder)
+            dbmoto.mycursor.execute(stmt, list(dct.values()))
+            config.mydb.commit()
+        else:
+            print('Dict not exist!')
 
     def get_since(id):
         dbmoto.mycursor.execute("SELECT Since FROM m_article WHERE ID ='"+id+"'")
