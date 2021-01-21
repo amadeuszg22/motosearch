@@ -37,7 +37,7 @@ class m_detail():
         else:
             lst.append("empty")
         if 'Przebieg' in self.detail.keys():
-            lst.append(self.detail['Przebieg'])
+            lst.append(re.sub("[^\d\.]", "", self.detail['Przebieg']))
         else:
             lst.append("empty")
         if 'Pojemność skokowa' in self.detail.keys():

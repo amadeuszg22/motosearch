@@ -9,6 +9,7 @@ import shutil
 import os
 from progress.bar import Bar
 import configparser
+import re
 
 
 class config:
@@ -20,8 +21,6 @@ class config:
     d_list=[]
     art_data={}
     a_list =[]
-    h_list =[]
-    h_data ={}
     p_list=[]
     p_data={}
     l_list=[]
@@ -120,7 +119,7 @@ class pool:
                 config.art_data['Title'] =art.find('h1', attrs={'class':'offer-title big-text'}).text.strip()
                 config.art_data['Price'] = art.find('div', attrs={'class':'offer-price'})['data-price'].replace(" ", "")
                 config.art_data['Year'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[0].text.strip()
-                config.art_data['Milage'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[1].text.strip()
+                config.art_data['Milage'] = re.sub("[^\d\.]", "", art.find_all('span', attrs={'class': 'offer-main-params__item'})[1].text.strip())
                 config.art_data['Fuel'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[2].text.strip()
                 config.art_data['Type'] = art.find_all('span', attrs={'class': 'offer-main-params__item'})[3].text.strip()
                 #Gatehering detailed offer description
@@ -219,7 +218,7 @@ class pool:
                         val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active"}
                         config.sys_log.append(val)
                 bar.next()
-            config.h_list=[]
+            
 
     def img_fetch(link,ID,filename):
         filename = config.img_src+ID+"/"+filename
