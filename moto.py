@@ -100,9 +100,9 @@ class pool:
 
     def article_fetch():
         #with Bar('       Getting articles and pictures',max = len(config.d_list)) as bar:
-        for a in config.d_list:
+        for l_lst in config.d_list:
                config.time_update()
-               raw= pool.feth(a['Link']+"")
+               raw= pool.feth(l_lst['Link']+"")
                sup = BeautifulSoup(raw.text, features="html.parser")
                try:
                 #Gathering basic offer descriprion
@@ -145,7 +145,7 @@ class pool:
                 val={'Timeup':config.date,'ID':config.art_data['ID'],'Category':"Info",'Activity':'location Fetch','Message':"location fetched for"+str(config.l_data)+":"}
                 config.sys_log.append(val)
                 config.l_list.append(config.l_data)
-                config.l_data ={}
+               
 
                 #Gatering offer details like car model vendor milage registration
                 detl=sup.find_all('div', attrs={'class': 'offer-params__value'})
@@ -159,7 +159,55 @@ class pool:
                 detdict=dict(zip(key,item))
                 detdict['ID']=config.art_data['ID']
                 config.l_detail.append(detdict)
+                #Collection data for compasrison           
+                dtails_hist=m_detail().detail_verify(detdict,config.date)
+                hist={
+                    'ID':config.art_data['ID'],
+                    'Link':l_lst['Link'],
+                    'Days':'0',
+                    'Since':config.art_data['Since'],
+                    'Status':'Active',
+                    'Title':config.art_data['Title'],
+                    'Price':config.art_data['Price'],
+                    'Year':config.art_data['Year'],
+                    'Fuel':config.art_data['Fuel'],
+                    'Milage':config.art_data['Milage'],
+                    'Type':config.art_data['Type'],
+                    'Description':det_desc,
+                    'Adress':str(detloc),
+                    'location':str(detmap),
+                    'Lng':str(detloc_long),
+                    'Lat':str(detloc_lat),
+                    'Ofer':dtails_hist[1],
+                    'Category':dtails_hist[2],
+                    'Vendor':dtails_hist[3],
+                    'Model':dtails_hist[4],
+                    'Version':dtails_hist[5],
+                    'Gen':dtails_hist[6],
+                    'En_l':dtails_hist[7],
+                    'Hp':dtails_hist[8],
+                    'Transmission':dtails_hist[9],
+                    'Drive':dtails_hist[10],
+                    'C_status':dtails_hist[11],
+                    'Typ':dtails_hist[12],
+                    'Door':dtails_hist[13],
+                    'Seats':dtails_hist[14],
+                    'Colour':dtails_hist[15],
+                    'Metallic':dtails_hist[16],
+                    'Finance':dtails_hist[17],
+                    'PL':dtails_hist[18],
+                    'Register':dtails_hist[19],
+                    'Pl_reg':dtails_hist[20],
+                    'Plates':dtails_hist[21],
+                    'F_owner':dtails_hist[22],
+                    'Aso':dtails_hist[23],
+                    'State':dtails_hist[24],
+                }
+                
+                #dbmoto.hist_logging(hist,'New item')
+                
                 detdict={}
+                config.l_data ={}
                 #Gatering offer images
                 img=sup.find_all('img', attrs={'class': 'bigImage'})
                 val=[]
@@ -184,8 +232,11 @@ class pool:
                         
                 config.a_list.append(config.art_data)
                 config.art_data={}
+               
+
                except(IndexError): 
                    print (sup)
+                   print ("INDEX ERROR")
                #bar.next()
            
     def hist_article_check():
@@ -263,6 +314,7 @@ class pool:
                 #config.sys_log.append(val)
         #else:
          #   print (filename+" Exist")
+        
 
 class dbmoto:
     mycursor = config.mydb.cursor()
@@ -434,6 +486,7 @@ class dbmoto:
                    config.mydb.commit()
                    #print(dbmoto.mycursor.rowcount, "record inserted to m_pictures table.")
                    config.m_desc=[]    
+
     def hist_logging(dct,stat):
         if dct :
             config.time_update()
