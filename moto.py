@@ -193,8 +193,9 @@ class pool:
         with Bar('Checking historical data:',max = len(history)) as bar:
             for a in history:
                 config.time_update()
+                #print (a)
                 if a['Timeup'] < (config.date - datetime.timedelta(hours=3)) or a['Status'] == "Inactive":
-                    raw= pool.feth(a['Links'])
+                    raw= pool.feth(a['Link'])
                     sup = BeautifulSoup(raw.text, features="html.parser")
                     try:
                         error=sup.find('span', attrs={'class':'subtitle'}).text.strip()
@@ -495,24 +496,16 @@ class dbmoto:
             
 
     def check_exist():
-        dbmoto.mycursor.execute("SELECT * FROM v_notify")
-        myresult = dbmoto.mycursor.fetchall()
+        mycursor = config.mydb.cursor(dictionary=True)
+        mycursor.execute("SELECT * FROM v_notify")
+        myresult = mycursor.fetchall()
         #print (myresult)
         data={}
         lst=[]
-        for i in myresult:
-            config.time_update()
-       
-            data['ID']=i[0]
-            data['Sys_ID']=i[1]
-            data['Links']=i[2]
-            data['Days']=i[3]
-            data['Since']=i[4]
-            data['Timeup']=i[5]
-            data['Status']=i[6]
-            lst.append(data)
-            data={}
-        return lst
+        lst_d=[]
+        lst_d.append(myresult)
+        
+        return myresult
 
 def main():
     while True:
