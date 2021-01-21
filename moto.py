@@ -194,30 +194,31 @@ class pool:
             for a in history:
                 config.time_update()
                 #print (a)
-                if a['Timeup'] < (config.date - datetime.timedelta(hours=3)) or a['Status'] == "Inactive":
-                    raw= pool.feth(a['Link'])
-                    sup = BeautifulSoup(raw.text, features="html.parser")
-                    try:
-                        error=sup.find('span', attrs={'class':'subtitle'}).text.strip()
-                    except(AttributeError):
-                        error=sup.find('span', attrs={'class':'subtitle'})
-                    try:
-                        tmpid=sup.find_all('span', attrs={'class':'offer-meta__value'})[1].text.strip()
-                    except(IndexError):
-                        tmpid = False
-                    #print (raw.status_code,a['ID'])
-                    if raw.status_code == 404 or error == "404 Strona nie została odnaleziona" or tmpid == False:
-                        if a['Status'] == "Active":
-                            #print (error)
-                            dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
+                if a['ID'] is not None:
+                    if a['Timeup'] < (config.date - datetime.timedelta(hours=3)) or a['Status'] == "Inactive":
+                        raw= pool.feth(a['Link'])
+                        sup = BeautifulSoup(raw.text, features="html.parser")
+                        try:
+                            error=sup.find('span', attrs={'class':'subtitle'}).text.strip()
+                        except(AttributeError):
+                            error=sup.find('span', attrs={'class':'subtitle'})
+                        try:
+                            tmpid=sup.find_all('span', attrs={'class':'offer-meta__value'})[1].text.strip()
+                        except(IndexError):
+                            tmpid = False
+                        #print (raw.status_code,a['ID'])
+                        if raw.status_code == 404 or error == "404 Strona nie została odnaleziona" or tmpid == False:
+                            if a['Status'] == "Active":
+                                #print (error)
+                                dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Inactive'})
+                                val=[]
+                                val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Inactive"}
+                                config.sys_log.append(val)
+                        elif a['Status'] == "Inactive":
+                            dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
                             val=[]
-                            val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Inactive"}
+                            val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active"}
                             config.sys_log.append(val)
-                    elif a['Status'] == "Inactive":
-                        dbmoto.update_items("m_article&link_incative",a['ID'],data={'Since':str(a['Since']),'Status':'Active'})
-                        val=[]
-                        val={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"Article status changed to Active"}
-                        config.sys_log.append(val)
                 bar.next()
             
 
@@ -497,14 +498,9 @@ class dbmoto:
 
     def check_exist():
         mycursor = config.mydb.cursor(dictionary=True)
-        mycursor.execute("SELECT * FROM v_notify")
+        mycursor.execute("SELECT * FROM v_details")
         myresult = mycursor.fetchall()
         #print (myresult)
-        data={}
-        lst=[]
-        lst_d=[]
-        lst_d.append(myresult)
-        
         return myresult
 
 def main():
