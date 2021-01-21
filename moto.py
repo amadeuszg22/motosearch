@@ -247,14 +247,14 @@ class pool:
                     shutil.copyfileobj(r.raw, f)
             
                 #print('Image sucessfully Downloaded: ',filename)
-                val=[]
-                val={'Timeup':config.date,'ID':ID,'Category':"Info",'Activity':'Image download','Message':"Image sucessfully Downloaded: "+filename}
-                config.sys_log.append(val)
-            else:
+                #val=[]
+                #val={'Timeup':config.date,'ID':ID,'Category':"Info",'Activity':'Image download','Message':"Image sucessfully Downloaded: "+filename}
+                #config.sys_log.append(val)
+            #else:
                 #print('Image Couldn\'t be retreived')
-                val=[]
-                val={'Timeup':config.date,'ID':ID,'Category':"Error",'Activity':'Image download','Message':"Image Couldn\'t be retreived"+filename}
-                config.sys_log.append(val)
+                #val=[]
+                #val={'Timeup':config.date,'ID':ID,'Category':"Error",'Activity':'Image download','Message':"Image Couldn\'t be retreived"+filename}
+                #config.sys_log.append(val)
         #else:
          #   print (filename+" Exist")
 
