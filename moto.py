@@ -27,6 +27,7 @@ class config:
     l_data={}
     l_detail=[]
     m_desc=[]
+    m_hist=[]
     log={}
     sys_log=[]
     mydb = mysql.connector.connect(
@@ -203,8 +204,8 @@ class pool:
                     'Aso':dtails_hist[23],
                     'State':dtails_hist[24],
                 }
+                config.m_hist.append(hist)
                 
-                #dbmoto.hist_logging(hist,'New item')
                 
                 detdict={}
                 config.l_data ={}
@@ -417,6 +418,8 @@ class dbmoto:
                 log={}
                 log={'Timeup':config.date,'ID':a['ID'],'Category':"Info",'Activity':'History check','Message':"New item, Article status set to Active"}
                 config.sys_log.append(log)
+                for h in config.m_hist:
+                    if h['ID'] == a['ID']: dbmoto.hist_logging(h,'New item')
             else:
                 #print ("exist:",a['ID'])
                 dbmoto.update_items("link",a['ID'])
@@ -493,6 +496,8 @@ class dbmoto:
             if 'Sys_ID' in dct: del dct['Sys_ID']
             dct['Timeup']=config.date
             dct['Art_Status']=stat
+            dct['Lng']=re.sub("[^\d\.]", "", dct['Lng'])
+            dct['Lat']=re.sub("[^\d\.]", "", dct['Lat'])
             print (dct)
             placeholder = ", ".join(["%s"] * len(dct))
             stmt = "insert into `{table}` ({columns}) values ({values});".format(table='m_history', columns=",".join(dct.keys()), values=placeholder)
